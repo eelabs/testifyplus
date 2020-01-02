@@ -46,7 +46,7 @@ jobs:
         run: |
           GOFLAGS='' go vet ./...
 
-  security:
+  security-review:
     name: Review security
     runs-on: ubuntu-latest
     steps:
@@ -65,6 +65,63 @@ jobs:
           export PATH=$PATH:$(go env GOPATH)/bin
           curl -sfL https://raw.githubusercontent.com/securego/gosec/master/install.sh | sh -s -- -b GOPATH/bin v2.1.0
           GOPATH/bin/gosec ./...
+
+  dependency-check:
+    name: OWASP Dependency check
+    runs-on: ubuntu-latest
+
+    steps:
+      # go dep is not needed for this step but adding so that the
+      # owasp-dependency-check dir can be add under GOPATH dir
+      # for ease of caching. There is probably a better way but easy is good for now
+      - name: Set up Go 1.13
+        uses: actions/setup-go@v1
+        with:
+          go-version: 1.13
+        id: go
+
+      - name: Check out code
+        uses: actions/checkout@master
+
+      - uses: actions/cache@v1
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      # https://github.com/jeremylong/DependencyCheck
+      - name: Scan dependencies
+        env: |
+          OWASPDC_DIRECTORY: ~/go/pkg/mod/cache/owasp-dependency-check
+        run: |
+          if [ ! -d "$DATA_DIRECTORY" ]; then
+            echo "Initially creating persistent directory: $DATA_DIRECTORY"
+            mkdir -p "$DATA_DIRECTORY"
+          fi
+          if [ ! -d "$REPORT_DIRECTORY" ]; then
+            echo "Initially creating persistent directory: $REPORT_DIRECTORY"
+            mkdir -p "$REPORT_DIRECTORY"
+          fi
+          if [ ! -d "$CACHE_DIRECTORY" ]; then
+            echo "Initially creating persistent directory: $CACHE_DIRECTORY"
+            mkdir -p "$CACHE_DIRECTORY"
+          fi
+
+          # Make sure we are using the latest version
+          docker pull owasp/dependency-check
+
+          docker run --rm \
+          --volume $(pwd):/src \
+          --volume "$DATA_DIRECTORY":/usr/share/dependency-check/data \
+          --volume "$REPORT_DIRECTORY":/report \
+          owasp/dependency-check \
+          --scan /src \
+          --format "ALL" \
+          --project "My OWASP Dependency Check Project" \
+          --out /report
+        # Use suppression like this: (/src == $pwd)
+        # --suppression "/src/security/dependency-check-suppression.xml"
 
   test:
     name: Test
