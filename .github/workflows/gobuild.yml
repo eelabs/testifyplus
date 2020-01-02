@@ -92,7 +92,7 @@ jobs:
 
       # https://github.com/jeremylong/DependencyCheck
       - name: Scan dependencies
-        env: |
+        env:
           OWASPDC_DIRECTORY: ~/go/pkg/mod/cache/owasp-dependency-check
         run: |
           ./dependency-check.sh
