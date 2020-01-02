@@ -1,8 +1,7 @@
 #!/usr/bin/env bash
 
 if [ ! -d "$OWASPDC_DIRECTORY" ]; then
-  ###OWASPDC_DIRECTORY=$PWD/owasp-dependency-check
-  OWASPDC_DIRECTORY=~/go/owasp-dependency-check
+  OWASPDC_DIRECTORY=~/go/pkg/mod/cache/owasp-dependency-check
   echo "Initially creating owasp root directory: $OWASPDC_DIRECTORY"
   mkdir -p "$OWASPDC_DIRECTORY"
 fi
