@@ -80,11 +80,13 @@ jobs:
         uses: actions/checkout@master
 
       # https://github.com/sonatype-nexus-community/intentionally-vulnerable-golang-project
+      # this will check vulnerabilities at build time but also turn on GH Security alerts
+      # (Settings -> Data services -> Security alerts) for out of process analysis
       - name: Install & Run Nancy
         run: |
           cd /tmp && mkdir tools && cd -
           apt-get update && apt install -y curl
-          curl -s -L "https://github.com/sonatype-nexus-community/nancy/releases/download/v0.0.39/nancy-linux.amd64-v0.0.39" -o "/tmp/tools/nancy"
+          curl -s -L "https://github.com/sonatype-nexus-community/nancy/releases/download/v0.0.40/nancy-linux.amd64-v0.0.40" -o "/tmp/tools/nancy"
           chmod +x /tmp/tools/nancy
           /tmp/tools/nancy go.sum
 
