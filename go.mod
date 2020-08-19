@@ -1,11 +1,9 @@
 module github.com/eelabs/testifyplus
 
-go 1.14
+go 1.15
 
 require (
-	github.com/containerd/containerd v1.3.7
-	github.com/google/go-cmp v0.5.1 // indirect
-	github.com/pkg/errors v0.9.1 // indirect
+	github.com/containerd/containerd v1.4.0
 	github.com/sirupsen/logrus v1.6.0
-	gotest.tools v2.2.0+incompatible // indirect
+	gotest.tools/v3 v3.0.2 // indirect
 )
